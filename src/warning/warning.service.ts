@@ -11,14 +11,21 @@ export class WarningService {
   }
 
   async list(idStudent: string): Promise<Warning[]> {
-    console.log('idStudent: ', idStudent);
-    const warnings = await this.warningModel.find({ idStudent });
-
-    console.log('warnings', warnings);
-    return warnings;
+    return await this.warningModel.find({ idStudent });
   }
 
-  async create(warningData: NewWarning) {
-    console.log('warningData ', warningData);
+  async create({ idStudent, title, description }: NewWarning) {
+    const warningsAmount = await this.warningModel.countDocuments({
+      idStudent,
+    });
+    const code = (Number(warningsAmount) + 1).toString();
+    const newWarning = await new this.warningModel({
+      code,
+      title,
+      description,
+      idStudent,
+    }).save();
+
+    return newWarning;
   }
 }
